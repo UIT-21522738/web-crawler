@@ -18,7 +18,7 @@ async function getProductSlug(query) {
     for (let i = 0; i < 8; i++) {
       await driver.findElement(By.css('button.d7ed-s0YDb1.d7ed-jQXTxb.d7ed-ZPZ4Mf.d7ed-YaJkXL.d7ed-bTLFAv')).click();
       await new Promise((resolve) => setTimeout(resolve, 2000));
-      await driver.executeScript("window.scrollBy(0,200)");
+      await driver.executeScript("window.scrollBy(0,500)");
       await new Promise((resolve) => setTimeout(resolve, 5000));
     }
     let products = await driver.findElement(By.className("d7ed-fdSIZS d7ed-OoK3wU d7ed-mPGbtR")).findElements(By.className("d7ed-d4keTB d7ed-OoK3wU"));
@@ -63,15 +63,18 @@ export async function SendoCrawl(query, res) {
         variants,
       } = data;
       
+      const minifiedDescription = description.replace(/(\r\n|\n|\r)/gm, " ");
+      const minifiedShortDescription = short_description.replace(/\r?\n/g, " ");
       const image_urls = await media.map((image) => image["image"]).join(", ");
       const category = await category_info.map((cat) => cat["title"]).join(", ");
-      const qty = variants[0]["stock"];
-      await pdata.push({
+      const qty = variants === null ? 0 : variants[0]["stock"];
+
+      pdata.push({
         SKU: sku_user,
         Name: name,
         Price: price,
-        Short_Description: short_description,
-        Description: description,
+        Short_Description: minifiedShortDescription,
+        Description: minifiedDescription,
         Category: category,
         Brand: brand_info["name"],
         Images: image_urls,
@@ -90,7 +93,7 @@ export async function SendoCrawl(query, res) {
     const csvConfig = mkConfig({ useKeysAsHeaders: true });
     const csv = generateCsv(csvConfig)(pdata);
     const date = new Date().toISOString().replace(/[:.]/g, '-');
-    const filename = `sendo-${query}-${date}.csv`;
+    const filename = `data/sendo-${query}-${date}.csv`;
     const csvBuffer = new Uint8Array(Buffer.from(asString(csv)));
     // Write the csv file to disk
     writeFile(filename, csvBuffer, (err) => {

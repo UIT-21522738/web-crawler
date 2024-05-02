@@ -58,20 +58,21 @@ export async function TikiCrawl(query, res) {
         images,
         stock_item: {qty},
       } = data;
-      
+
+      const minifiedDescription = description.replace(/(\r\n|\n|\r)/gm, " ");
       const image_urls = images.map((image) => image.base_url).join(", ");
       pdata.push({
         SKU: sku,
         Name: name,
         Price: price,
         Short_Description: short_description,
-        Description: description,
+        Description: minifiedDescription,
         Category: categories["name"],
         Brand: brand["name"],
         Images: image_urls,
         Quantity: qty,
       })
-      let i = Math.round(Math.random() * 30);
+      let i = Math.round(Math.random() * 60);
       if (i === 29) {
         await new Promise((resolve) => setTimeout(resolve, 4000));
       }
