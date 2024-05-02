@@ -1,0 +1,32 @@
+<div>
+    <h2>Choose website</h2>
+    <p>query: </p>
+    <input type="text">
+    <p class="result"></p>
+    <button type="button" id="tiki">Tiki</button>
+    <button type="button" id="sendo">Sendo</button>
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+
+<script>
+    $(document).ready(function(){
+        $("#tiki").click(function(){
+            let link = $('input').val();
+            $(".result").css("visibility", "visible");
+            $(".result").text("Vui lòng chờ...");
+            $.post('/tiki', {link: link} ,function (data) {
+                $(".result").text(data);
+            })
+        });
+        $("#sendo").click(function(){
+            let link = $('input[type=text]').val();
+            $(".result").css("visibility", "visible");
+            $(".result").text("Vui lòng chờ...");
+            $.post('/sendo', {link: link} ,function (data) {
+                $(".result").text(data);
+            })
+        });
+    });
+</script>
