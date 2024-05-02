@@ -6,6 +6,7 @@ import { Buffer } from "node:buffer";
 async function getProductId(query) {
   const driver = await new Builder().forBrowser('chrome').build();
   var p_ids = [];
+  var sp_ids = [];
   let pageNumber = 1;
 
   try {
@@ -21,6 +22,7 @@ async function getProductId(query) {
             const data = await JSON.parse(d)['click_data'];
             console.log("data: ", data);
             p_ids.push(data['id']);
+            sp_ids.push(data['sp_id']);
         }
         await new Promise((resolve) => setTimeout(resolve, 3000));
         pageNumber++;
@@ -35,18 +37,28 @@ async function getProductId(query) {
         await driver.close();
     }
   }
-  return p_ids;
+  return [p_ids, sp_ids];
 }
 
 
 export async function TikiCrawl(query, res) {
-  const ids = await getProductId(query);
+  const [ids, sp_ids] = await getProductId(query);
   const pdata = [];
-  for (const id of ids) 
+  for (let i=0; i < ids.length; i++) 
   {
     try {
-      const response = await fetch(`https://tiki.vn/api/v2/products/${id}`);
-      const data = await response.json();
+        await new Promise((resolve) => setTimeout(resolve, 100));
+      const response = await fetch(`https://tiki.vn/api/v2/products/${ids[i]}?sp_id=${sp_ids[i]}`);
+      var data;
+      try {
+        data = await response.json();
+      } catch (e) {
+        console.log(e);
+        response.text().then((t) => {
+            console.log(t);
+        })
+        .catch(e => {console.log(e); res.json(response); console.log(response.body); return;});
+      }
       const {
         sku,
         name,
@@ -72,13 +84,12 @@ export async function TikiCrawl(query, res) {
         Images: image_urls,
         Quantity: qty,
       })
-      let i = Math.round(Math.random() * 60);
-      if (i === 29) {
-        await new Promise((resolve) => setTimeout(resolve, 4000));
+      if (i % 40 === 0) {
+        await new Promise((resolve) => setTimeout(resolve, 8000));
       }
     }
     catch (error) {
-      console.error(`Error fetching product details for ${id}:`, error);
+      console.error(`Error fetching product details for ${id[i]}:`, error);
     } 
   }
   try {
