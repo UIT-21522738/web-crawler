@@ -44,12 +44,12 @@ app.get('/', (req, res) => {
 
 app.post('/sendo', async (req, res) => {
     console.log(req.body.link)
-    await SendoCrawl(req.body.link, res);
+    await SendoCrawl(req.body.link, req.body.number, res);
 })
 
 app.post('/tiki', async (req, res) => {
   console.log(req.body.link)
-  await TikiCrawl(req.body.link, res);
+  await TikiCrawl(req.body.link, req.body.number, res);
 })
 
 app.listen(port, () => {

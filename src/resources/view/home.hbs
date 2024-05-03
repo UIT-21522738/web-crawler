@@ -1,7 +1,9 @@
 <div>
     <h2>Choose website</h2>
     <p>query: </p>
-    <input type="text">
+    <input type="text" id="query">
+    <p>Number product: </p>
+    <input type="number" id="number">
     <p class="result"></p>
     <button type="button" id="tiki">Tiki</button>
     <button type="button" id="sendo">Sendo</button>
@@ -13,18 +15,20 @@
 <script>
     $(document).ready(function(){
         $("#tiki").click(function(){
-            let link = $('input').val();
+            let link = $('#query').val();
+            let number = $('#number').val();
             $(".result").css("visibility", "visible");
             $(".result").text("Vui lòng chờ...");
-            $.post('/tiki', {link: link} ,function (data) {
+            $.post('/tiki', {link: link, number: number} ,function (data) {
                 $(".result").text(data);
             })
         });
         $("#sendo").click(function(){
-            let link = $('input[type=text]').val();
+            let link = $('#query').val();
+            let number = $('#number').val();
             $(".result").css("visibility", "visible");
             $(".result").text("Vui lòng chờ...");
-            $.post('/sendo', {link: link} ,function (data) {
+            $.post('/sendo', {link: link, number: number} ,function (data) {
                 $(".result").text(data);
             })
         });

@@ -3,7 +3,7 @@ import { mkConfig, generateCsv, asString } from "export-to-csv";
 import { writeFile } from "node:fs";
 import { Buffer } from "node:buffer";
 
-async function getProductSlug(query) {
+async function getProductSlug(query, number) {
   const driver = await new Builder().forBrowser('chrome').build();
   var slugs = [];
   try {
@@ -12,15 +12,19 @@ async function getProductSlug(query) {
     // Đợi trang web load đến khi có danh sách các sản phẩm
     await driver.wait(until.elementLocated(By.xpath('//*[@id="main"]/div[1]/div/div[2]/div[2]/div[2]/div')), 20000);
     await new Promise((resolve) => setTimeout(resolve, 1000));
-    await driver.executeScript("window.scrollTo(0, document.body.scrollHeight)");
-    await new Promise((resolve) => setTimeout(resolve, 5000));
-    // Duyệt từng trang để lấy danh sách sản phẩm
-    for (let i = 0; i < 8; i++) {
-      await driver.findElement(By.css('button.d7ed-s0YDb1.d7ed-jQXTxb.d7ed-ZPZ4Mf.d7ed-YaJkXL.d7ed-bTLFAv')).click();
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      await driver.executeScript("window.scrollBy(0,500)");
+    if (number > 60) 
+    {
+      await driver.executeScript("window.scrollTo(0, document.body.scrollHeight)");
       await new Promise((resolve) => setTimeout(resolve, 5000));
+      // Duyệt từng trang để lấy danh sách sản phẩm
+      for (let i = 0; i < number/60 - 2; i++) {
+        await driver.findElement(By.css('button.d7ed-s0YDb1.d7ed-jQXTxb.d7ed-ZPZ4Mf.d7ed-YaJkXL.d7ed-bTLFAv')).click();
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+        await driver.executeScript("window.scrollBy(0,500)");
+        await new Promise((resolve) => setTimeout(resolve, 5000));
+      }
     }
+    
     let products = await driver.findElement(By.className("d7ed-fdSIZS d7ed-OoK3wU d7ed-mPGbtR")).findElements(By.className("d7ed-d4keTB d7ed-OoK3wU"));
     await new Promise((resolve) => setTimeout(resolve, 2000));
     for (const product of products) { 
@@ -42,8 +46,8 @@ async function getProductSlug(query) {
   return slugs;
 }
 
-export async function SendoCrawl(query, res) {
-  const slugs = await getProductSlug(query);
+export async function SendoCrawl(query, number, res) {
+  const slugs = await getProductSlug(query,number);
   const pdata = [];
   for (const slug of slugs) 
   {

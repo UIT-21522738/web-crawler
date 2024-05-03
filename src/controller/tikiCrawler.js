@@ -3,14 +3,14 @@ import { mkConfig, generateCsv, asString } from "export-to-csv";
 import { writeFile } from "node:fs";
 import { Buffer } from "node:buffer";
 
-async function getProductId(query) {
+async function getProductId(query, number) {
   const driver = await new Builder().forBrowser('chrome').build();
   var p_ids = [];
   var sp_ids = [];
   let pageNumber = 1;
 
   try {
-    while (p_ids.length <= 501) {
+    while (p_ids.length <= number) {
         await driver.get(`https://tiki.vn/search?q=${query}&page=${pageNumber}`);
         await driver.wait(until.elementLocated(By.xpath('//*[@id="__next"]/div[1]/main/div/div[2]/div[1]/div[2]')), 20000);
         await new Promise((resolve) => setTimeout(resolve, 5000));
@@ -41,8 +41,8 @@ async function getProductId(query) {
 }
 
 
-export async function TikiCrawl(query, res) {
-  const [ids, sp_ids] = await getProductId(query);
+export async function TikiCrawl(query, number, res) {
+  const [ids, sp_ids] = await getProductId(query, number);
   const pdata = [];
   for (let i=0; i < ids.length; i++) 
   {
