@@ -1,0 +1,148 @@
+
+<div class="container">
+    <h1>Web Crawler Interface</h1>
+    <div class="form-group">
+        <label for="query">Query</label>
+        <input type="text" id="query" placeholder="Enter search query">
+    </div>
+    <div class="form-group">
+        <label for="number">Number</label>
+        <input type="number" id="number" placeholder="Enter number of results">
+    </div>
+    <div class="button-group">
+        <button id="tiki">Tiki</button>
+        <button id="sendo">Sendo</button>
+    </div>
+</div>
+
+<div class="container results">
+    <h2>Download CSV Result</h2>
+    <a href="#" id="download-link">Download CSV</a>
+</div>
+
+<div class="container">
+    <h2>Crawler Results</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>SKU</th>
+                <th>Name</th>
+                <th>Price</th>
+                <th>Short_Description</th>
+                <th>Category</th>
+                <th>Brand</th>
+                <th>Images</th>
+                <th>Quantity</th>
+            </tr>
+        </thead>
+        <tbody id="crawler-results">
+            <!-- Crawler results will be inserted here -->
+        </tbody>
+    </table>
+</div>
+
+<script id="entry-template" type="text/x-handlebars-template">
+    <div class="container">
+        <h1>Web Crawler Interface</h1>
+        <div class="form-group">
+            <label for="query">Query</label>
+            <input type="text" id="query" placeholder="Enter search query">
+        </div>
+        <div class="form-group">
+            <label for="number">Number</label>
+            <input type="number" id="number" placeholder="Enter number of results">
+        </div>
+        <div class="button-group">
+            <button id="tiki">Tiki</button>
+            <button id="sendo">Sendo</button>
+        </div>
+    </div>
+    <div class="container results">
+        <h2>Download CSV Result</h2>
+        <a href="#" id="download-link">Download CSV</a>
+    </div>
+    <div class="container">
+        <h2>Crawler Results</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>SKU</th>
+                    <th>Name</th>
+                    <th>Price</th>
+                    <th>Short_Description</th>
+                    <th>Category</th>
+                    <th>Brand</th>
+                    <th>Images</th>
+                    <th>Quantity</th>
+                </tr>
+            </thead>
+            <tbody id="crawler-results">
+                <!-- Crawler results will be inserted here -->
+            </tbody>
+        </table>
+    </div>
+</script>
+
+
+<script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+<script>
+    function displayResults(results) {
+        const tbody = document.getElementById('crawler-results');
+        tbody.innerHTML = '';
+
+        results.forEach(function (result) {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${result.SKU}</td>
+                <td>${result.Name}</td>
+                <td>${result.Price}</td>
+                <td>${result.Short_Description}</td>
+                <td>${result.Category}</td>
+                <td>${result.Brand}</td>
+                <td>${result.Images}</td>
+                <td>${result.Quantity}</td>
+            `;
+            tbody.appendChild(row);
+        });
+    }
+
+    function downloadCSV(results) {
+        let csvContent = "data:text/csv;charset=utf-8,";
+        csvContent += "ID,Query,Number of Results,Source\n";
+
+        results.forEach(function (result) {
+            const row = `${result.SKU},${result.Name},${result.Price},${result.Short_Description},${result.Description},${result.Brand},${result.Images},${result.Quantity}\n`;
+            csvContent += row;
+        });
+
+        const encodedUri = encodeURI(csvContent);
+        const downloadLink = document.getElementById('download-link');
+        downloadLink.setAttribute("href", encodedUri);
+        downloadLink.setAttribute("download", "crawler_results.csv");
+    }
+
+    $(document).ready(function(){
+        $("#tiki").click(function(){
+            let link = $('#query').val();
+            let number = $('#number').val();
+            $(".result").css("visibility", "visible");
+            $(".result").text("Vui lòng chờ...");
+            $.post('/tiki', {link: link, number: number} ,function (data) {
+                displayResults(data);
+
+                downloadCSV(data);
+            })
+        });
+        $("#sendo").click(function(){
+            let link = $('#query').val();
+            let number = $('#number').val();
+            $(".result").css("visibility", "visible");
+            $(".result").text("Vui lòng chờ...");
+            $.post('/sendo', {link: link, number: number} ,function (data) {
+                displayResults(data);
+
+                downloadCSV(data);
+            })
+        });
+    });
+</script>

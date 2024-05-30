@@ -107,7 +107,7 @@ export async function SendoCrawl(query, number, res) {
   } catch (e) {
     console.log("error: ", e);
   } finally { 
-    res.send('success');
+    res.send(pdata);
   }
   
 }

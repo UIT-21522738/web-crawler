@@ -32,20 +32,23 @@ app.engine(
     }),
 );
 
-
-
 app.set('view engine', 'hbs');
 app.set('views', path.join(__dirname, 'resources/view'));
 
 // /
 app.get('/', (req, res) => {
-    res.render('home');
+    res.render('crawler');
 })
 
 app.post('/sendo', async (req, res) => {
     console.log(req.body.link)
     await SendoCrawl(req.body.link, req.body.number, res);
 })
+
+app.get('/download', (req, res) => {
+  const file = path.join(__dirname, req.params.q);
+  res.download(file);
+});
 
 app.post('/tiki', async (req, res) => {
   console.log(req.body.link)

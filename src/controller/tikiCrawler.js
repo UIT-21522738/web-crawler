@@ -77,8 +77,8 @@ export async function TikiCrawl(query, number, res) {
         SKU: sku,
         Name: name,
         Price: price,
-        Short_Description: short_description,
-        Description: minifiedDescription,
+        Short_Description: short_description.replace(/(\r\n|\n|\r)/gm, " "),
+        Description: minifiedDescription.replace(/(\r\n|\n|\r)/gm, " "),
         Category: categories["name"],
         Brand: brand["name"],
         Images: image_urls,
@@ -106,7 +106,7 @@ export async function TikiCrawl(query, number, res) {
   } catch (e) {
     console.log("error: ", e);
   } finally { 
-    res.send('success');
+    res.send(pdata);
   }
   
 }
